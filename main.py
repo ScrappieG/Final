@@ -63,11 +63,11 @@ def draw_game_start(screen):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if easy_rectangle.collidepoint(event.pos):
-                    return "easy"
+                    return 30
                 elif medium_rectangle.collidepoint(event.pos):
-                    return "medium"
+                    return 40
                 elif hard_rectangle.collidepoint(event.pos):
-                    return "hard"
+                    return 50
             pygame.display.update()
 
 
@@ -106,6 +106,8 @@ def main():
     newBoard = Board(WIDTH,HEIGHT,screen, difficulty)
 
     running = True
+
+    generatedSudoku = sudoku_generator.generate_sudoku(9,difficulty)
 
     # Does not close pygame, just switches to the end screen.
 
