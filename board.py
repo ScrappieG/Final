@@ -9,11 +9,19 @@ class Board:
         self.height = height
         self.screen = screen
         self.difficulty = difficulty
+
+        # List of rows, each row is a list of cells objects.
+
         self.cells = [[Cell("",i,x, screen) for i in range(0,9)] for x in range(0,9)]
+
+        # Stores the selected row and column for easier searching.
+
         self.selected = selected = (None, None)
 
     def draw(self):
         button_font = pygame.font.Font(None, 70)
+
+        # Draws the grid lines.
 
         for i in range(0, 10):
             if i % 3 == 0:
@@ -63,54 +71,82 @@ class Board:
             for cell in row:
                 cell.draw()
 
+        # For use in main.
 
         return reset_rectangle, restart_rectangle, exit_rectangle
 
     def select(self, row, col):
+
+        # Sets the boards selected property to the row and column.
+
         self.selected = row, col
+
+        # Updates all cells to deselect previously selected cells.
+
         for r in self.cells:
             for c in r:
                 if c.selected:
                     c.selected = False
+
+        # If the selection is not out of bounds, set the cell to be selected.
 
         if row != None and col != None:
             self.cells[col][row].selected = True
         return
 
     def click(self, x, y):
+
+        # Gets position of cursor.
+
         row = y // 60
         col = x // 60
+
+        # Checks if cursor is within the grid (smaller than the actual screen)
 
         if 2 < row < 12 and 12 > col > 2:
             row = row - 3
             col = col - 3
+
+            # Selects the box using adjusted row and column values.
+
             self.select(row, col)
             return row, col
         else:
-            for r in self.cells:
-                for c in r:
-                    if c.selected:
-                        c.selected = False
+
+            # If invalid selection, removes the selection box.
+
             self.select(None, None)
             return None
 
     def clear(self):
+
+        # Sets the selected cells value to the default.
+
         self.cells[self.selected[1]][self.selected[0]].set_cell_value("")
 
         return
 
     def sketch(self, number):
+
+        # Sets the sketched value of the cell to the number provided.
+
         self.cells[self.selected[1]][self.selected[0]].set_sketched_value(number)
 
         return
 
     def place_number(self, value):
+
+        # Sets the value of the cell to the number provided, removes the sketched value.
+
         self.cells[self.selected[1]][self.selected[0]].set_cell_value(value)
         self.cells[self.selected[1]][self.selected[0]].set_sketched_value("")
 
         return
 
     def reset_to_original(self):
+
+        # Sets all values (actual functionality ) of player controlled cells (intentional functionality) to none.
+
         for r in self.cells:
             for c in r:
                 c.value = ""
@@ -118,6 +154,9 @@ class Board:
         return
 
     def is_full(self):
+
+        # Goes through every cell, if one has the default value, returns false, otherwise, returns true.
+
         for row in self.cells:
             for cell in row:
                 if cell.value == "":
