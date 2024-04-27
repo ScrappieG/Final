@@ -101,7 +101,7 @@ def main():
 
     difficulty = draw_game_start(screen)
 
-    #Instantiates board.
+    # Instantiates board object under name newBoard.
 
     newBoard = Board(WIDTH,HEIGHT,screen, difficulty)
 
@@ -157,10 +157,12 @@ def main():
                         if 0 <= changed <= 8:
                             newBoard.select(changed, newBoard.selected[1])
 
-                        # This locks in a sketched number.
+                    # This locks in a sketched number.
 
                     elif pygame.key.key_code(pygame.key.name(event.key)) == pygame.K_RETURN:
                         newBoard.place_number(newBoard.cells[newBoard.selected[1]][newBoard.selected[0]].sketched_value)
+
+                    # This erases a locked in number.
 
                     elif pygame.key.key_code(pygame.key.name(event.key)) == pygame.K_BACKSPACE:
                         newBoard.clear()
