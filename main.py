@@ -160,7 +160,7 @@ def main():
                         # This locks in a sketched number.
 
                     elif pygame.key.key_code(pygame.key.name(event.key)) == pygame.K_RETURN:
-                        newBoard.place_number(newBoard.sketched_in[newBoard.selected[1]][newBoard.selected[0]])
+                        newBoard.place_number(newBoard.cells[newBoard.selected[1]][newBoard.selected[0]].sketched_value)
 
                     elif pygame.key.key_code(pygame.key.name(event.key)) == pygame.K_BACKSPACE:
                         newBoard.clear()
