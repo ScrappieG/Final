@@ -112,7 +112,10 @@ class SudokuGenerator:
 
 	Return: boolean
     '''
-    def valid_in_box(self, row_start, col_start, num):
+    def valid_in_box(self, row, col, num):
+        row_start = 3 * (row // 3)
+        col_start = 3 * (col // 3)
+
         for i in range(3):
             for j in range(3):
                 if row_start + i >= len(self.board) or col_start + j >= len(self.board):
@@ -228,6 +231,7 @@ class SudokuGenerator:
 	Return: None
     '''
     def fill_values(self):
+
         self.fill_diagonal()
         self.fill_remaining(0, self.box_length)
 
@@ -245,13 +249,21 @@ class SudokuGenerator:
     '''
     def remove_cells(self):
         removed_cells = 0
+
+        nozeroes = []
+        for i, r in enumerate(self.board):
+            for x, c in enumerate(r):
+                if c != 0:
+                    nozeroes.append((i, x))
+
         while removed_cells < self.removed_cells:
-            row = random.randint(0, int(self.box_length - 1))
-            col = random.randint(0, int(self.box_length - 1))
-            if self.board[row][col] != 0:
-                self.board[row][col] = 0
-                removed_cells += 1
-            # This should be okay because there should always be an equal ammount of rows and cols
+            randplace = nozeroes[random.randint(0, len(nozeroes)-1)]
+            nozeroes.remove(randplace)
+            self.board[randplace[0]][randplace[1]] = 0
+            removed_cells += 1
+
+            # This should be okay because there should always be an equal amount of rows and cols
+
         print(f'Removed {removed_cells} cells')
         return
 
