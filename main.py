@@ -107,30 +107,42 @@ def main():
 
     running = True
 
-    while running:
-        # poll for events
-        # pygame.QUIT event means the user clicked X to close your window
-        # fill the screen with a color to wipe away anything from last frame
-        screen.fill("light blue")
+    # Does not close pygame, just switches to the end screen.
 
-        reset_rectangle, restart_rectangle, exit_rectangle = newBoard.draw()
+    end = False
+
+    while running:
+
+        if end:
+            draw_game_end(screen, "Win")
+        else:
+            # poll for events
+            # pygame.QUIT event means the user clicked X to close your window
+            # fill the screen with a color to wipe away anything from last frame
+            screen.fill("light blue")
+
+            reset_rectangle, restart_rectangle, exit_rectangle = newBoard.draw()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # Controls the menu buttons.
 
                 if reset_rectangle.collidepoint(event.pos):
                     newBoard.reset_to_original()
                 elif restart_rectangle.collidepoint(event.pos):
-                    return 0
+                    difficulty = draw_game_start(screen)
+                    newBoard = Board(WIDTH, HEIGHT, screen, difficulty)
+
                 elif exit_rectangle.collidepoint(event.pos):
                     running = False
+
                 else:
                     # Selects a square
 
-                    newBoard.click(event.pos[0],event.pos[1])
+                    newBoard.click(event.pos[0], event.pos[1])
 
             elif event.type == pygame.KEYDOWN:
                 # Redundant, but breaks if changed, don't ask me why.
@@ -160,18 +172,18 @@ def main():
                     # This locks in a sketched number.
 
                     elif pygame.key.key_code(pygame.key.name(event.key)) == pygame.K_RETURN:
-                        newBoard.place_number(newBoard.cells[newBoard.selected[1]][newBoard.selected[0]].sketched_value)
+                        newBoard.place_number(
+                            newBoard.cells[newBoard.selected[1]][newBoard.selected[0]].sketched_value)
 
                     # This erases a locked in number.
 
                     elif pygame.key.key_code(pygame.key.name(event.key)) == pygame.K_BACKSPACE:
                         newBoard.clear()
 
-            pygame.display.update()
-
-        # RENDER YOUR GAME HERE
+        pygame.display.update()
 
         # flip() the display to put your work on screen
+
         pygame.display.flip()
 
     pygame.quit()
