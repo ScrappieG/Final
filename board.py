@@ -9,14 +9,11 @@ class Board:
         self.height = height
         self.screen = screen
         self.difficulty = difficulty
-        self.locked_in = [["" for i in range(0, 9)] for i in range(0, 9)]
-        self.sketched_in = [["" for i in range(0, 9)] for i in range(0, 9)]
+        self.cells = [[Cell("",i,x, screen) for i in range(0,9)] for x in range(0,9)]
         self.selected = selected = (None, None)
 
     def draw(self):
         button_font = pygame.font.Font(None, 70)
-        sketch_font = pygame.font.Font(None, 45)
-        number_font = pygame.font.Font(None, 60)
 
         for i in range(0, 10):
             if i % 3 == 0:
@@ -60,34 +57,24 @@ class Board:
         self.screen.blit(restart_buttonSurface, restart_rectangle)
         self.screen.blit(exit_buttonSurface, exit_rectangle)
 
-        # Draws Selection box
+        # Draws sketched and locked in numbers, selection box
 
-        # Redundant, but breaks if you change it to just if self.selected[0] and self.selected[1], don't ask me why.
+        for row in self.cells:
+            for cell in row:
+                cell.draw()
 
-        if self.selected[0] != None and self.selected[1] != None:
-            col = self.selected[1]
-            row = self.selected[0]
-            selection_box = pygame.draw.rect(self.screen, "orange", [180 + col * 60, 180 + row * 60, 60, 60], 3)
-
-        # Draws sketched and locked in numbers
-
-        for i, v in enumerate(self.sketched_in):
-            for x, y in enumerate(v):
-                if y != "":
-                    sketched_text = sketch_font.render(y, 0, (100, 100, 100))
-                    self.screen.blit(sketched_text, dest=[185 + i * 60, 185 + x * 60])
-
-        for i, v in enumerate(self.locked_in):
-            for x, y in enumerate(v):
-                if y != "":
-
-                    sketched_text = number_font.render(y, 0, (0, 0, 0))
-                    self.screen.blit(sketched_text, dest=[198 + i * 60, 191 + x * 60])
 
         return reset_rectangle, restart_rectangle, exit_rectangle
 
     def select(self, row, col):
         self.selected = row, col
+        for r in self.cells:
+            for c in r:
+                if c.selected:
+                    c.selected = False
+
+        if row != None and col != None:
+            self.cells[col][row].selected = True
         return
 
     def click(self, x, y):
@@ -100,31 +87,40 @@ class Board:
             self.select(row, col)
             return row, col
         else:
+            for r in self.cells:
+                for c in r:
+                    if c.selected:
+                        c.selected = False
             self.select(None, None)
             return None
 
     def clear(self):
-        self.locked_in[self.selected[1]][self.selected[0]] = ""
+        self.cells[self.selected[1]][self.selected[0]].set_cell_value("")
+
         return
 
     def sketch(self, number):
-        self.sketched_in[self.selected[1]][self.selected[0]] = number
+        self.cells[self.selected[1]][self.selected[0]].set_sketched_value(number)
+
         return
 
     def place_number(self, value):
-        self.locked_in[self.selected[1]][self.selected[0]] = value
-        self.sketched_in[self.selected[1]][self.selected[0]] = ""
+        self.cells[self.selected[1]][self.selected[0]].set_cell_value(value)
+        self.cells[self.selected[1]][self.selected[0]].set_sketched_value("")
+
         return
 
     def reset_to_original(self):
-        self.locked_in = [["" for i in range(0, 9)] for i in range(0, 9)]
-        self.sketched_in = [["" for i in range(0, 9)] for i in range(0, 9)]
+        for r in self.cells:
+            for c in r:
+                c.value = ""
+                c.sketched_value = ""
         return
 
     def is_full(self):
-        for x in self.locked_in():
-            for y in x:
-                if y == "":
+        for row in self.cells:
+            for cell in row:
+                if cell.value == "":
                     return False
 
         return True
