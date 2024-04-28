@@ -63,7 +63,7 @@ def draw_game_start(screen):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if easy_rectangle.collidepoint(event.pos):
-                    return 2
+                    return 30
                 elif medium_rectangle.collidepoint(event.pos):
                     return 40
                 elif hard_rectangle.collidepoint(event.pos):
