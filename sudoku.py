@@ -95,6 +95,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Sudoku")
+    win = False
 
     horizontal = {"left":-1,"right":1}
     vertical = {"up":-1, "down":1}
@@ -107,7 +108,9 @@ def main():
 
     running = True
 
-    generatedSudoku = sudoku_generator.generate_sudoku(9,difficulty)
+    generatedSudoku, solution = sudoku_generator.generate_sudoku(9,difficulty)
+
+    newBoard.update_board(generatedSudoku)
 
     # Does not close pygame, just switches to the end screen.
 
@@ -116,7 +119,7 @@ def main():
     while running:
 
         if end:
-            draw_game_end(screen, "Win")
+            draw_game_end(screen, win)
         else:
             # poll for events
             # pygame.QUIT event means the user clicked X to close your window
@@ -137,6 +140,9 @@ def main():
                 elif restart_rectangle.collidepoint(event.pos):
                     difficulty = draw_game_start(screen)
                     newBoard = Board(WIDTH, HEIGHT, screen, difficulty)
+                    generatedSudoku, solution = sudoku_generator.generate_sudoku(9, difficulty)
+
+                    newBoard.update_board(generatedSudoku)
 
                 elif exit_rectangle.collidepoint(event.pos):
                     running = False
@@ -182,6 +188,15 @@ def main():
                     elif pygame.key.key_code(pygame.key.name(event.key)) == pygame.K_BACKSPACE:
                         newBoard.clear()
 
+        full = newBoard.is_full()
+        if full:
+            result = newBoard.check_board(solution)
+            if result:
+                win = "Win"
+            else:
+                win = "Lose"
+            end = True
+
         pygame.display.update()
 
         # flip() the display to put your work on screen
@@ -194,4 +209,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

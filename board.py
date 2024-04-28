@@ -12,7 +12,7 @@ class Board:
 
         # List of rows, each row is a list of cells objects.
 
-        self.cells = [[Cell("",i,x, screen) for i in range(0,9)] for x in range(0,9)]
+        self.cells = [[Cell(0,i,x, screen) for i in range(0,9)] for x in range(0,9)]
 
         # Stores the selected row and column for easier searching.
 
@@ -122,24 +122,27 @@ class Board:
 
         # Sets the selected cells value to the default.
 
-        self.cells[self.selected[1]][self.selected[0]].set_cell_value("")
+        self.cells[self.selected[1]][self.selected[0]].set_cell_value(0)
 
         return
 
     def sketch(self, number):
 
         # Sets the sketched value of the cell to the number provided.
+        selectedcell = self.cells[self.selected[1]][self.selected[0]]
+        if not selectedcell.generated:
+            selectedcell.set_sketched_value(number)
 
-        self.cells[self.selected[1]][self.selected[0]].set_sketched_value(number)
 
         return
 
     def place_number(self, value):
 
         # Sets the value of the cell to the number provided, removes the sketched value.
-
-        self.cells[self.selected[1]][self.selected[0]].set_cell_value(value)
-        self.cells[self.selected[1]][self.selected[0]].set_sketched_value("")
+        selectedcell = self.cells[self.selected[1]][self.selected[0]]
+        if not selectedcell.generated:
+            selectedcell.set_sketched_value(0)
+            selectedcell.set_cell_value(value)
 
         return
 
@@ -149,8 +152,8 @@ class Board:
 
         for r in self.cells:
             for c in r:
-                c.value = ""
-                c.sketched_value = ""
+                if not c.generated:
+                    c.set_cell_value(0)
         return
 
     def is_full(self):
@@ -159,21 +162,32 @@ class Board:
 
         for row in self.cells:
             for cell in row:
-                if cell.value == "":
+                if cell.value == 0:
                     return False
 
         return True
 
-    def update_board(self):
-
+    def update_board(self, update):
+        for i, row in enumerate(self.cells):
+            for x, cell in enumerate(row):
+                if update[i][x] != 0:
+                    self.cells[i][x].generated = True
+                self.cells[i][x].set_cell_value(update[i][x])
         return
 
     def find_empty(self):
+        found = None
 
+        for i, row in enumerate(self.cells):
+            for x,cell in enumerate(row):
+                if cell.value == 0:
+                    found = i,x
 
-        return
+        return tuple(i,x)
 
-    def check_board(self):
-        return
-
-
+    def check_board(self, solution):
+        for i,r in enumerate(self.cells):
+            for x,c in enumerate(r):
+                if str(c.value) != str(solution[i][x]):
+                    return False
+        return True
