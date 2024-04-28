@@ -63,7 +63,7 @@ def draw_game_start(screen):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if easy_rectangle.collidepoint(event.pos):
-                    return 30
+                    return 2
                 elif medium_rectangle.collidepoint(event.pos):
                     return 40
                 elif hard_rectangle.collidepoint(event.pos):
@@ -78,13 +78,32 @@ def draw_game_end(screen, win):
     title_font = pygame.font.Font(None, 100)
     mode_font = pygame.font.Font(None, 80)
 
+    exit_button = button_font.render("EXIT", 0, (255, 255, 255))
+    exit_buttonSurface = pygame.Surface((exit_button.get_width() + 20, exit_button.get_height() + 20))
+    exit_buttonSurface.fill("orange")
+    exit_buttonSurface.blit(exit_button, (10, 10))
+    exit_rectangle = exit_buttonSurface.get_rect(center=(1000,1000))
+
+    restart_button = button_font.render("RESTART", 0, (255, 255, 255))
+    restart_buttonSurface = pygame.Surface((restart_button.get_width() + 20, restart_button.get_height() + 20))
+    restart_buttonSurface.fill("orange")
+    restart_buttonSurface.blit(restart_button, (10, 10))
+    restart_rectangle = restart_buttonSurface.get_rect(center=(1000,1000))
+
     if win == "Win":
         title_surface = title_font.render("You win!", 0, TITLE_FONT_COLOR)
+        exit_rectangle = exit_buttonSurface.get_rect(center=(WIDTH // 2, HEIGHT - (HEIGHT // 5)))
+        screen.blit(exit_buttonSurface, exit_rectangle)
     else:
         title_surface = title_font.render("Game over!", 0, TITLE_FONT_COLOR)
+        restart_rectangle = restart_buttonSurface.get_rect(center=(WIDTH // 2, HEIGHT - (HEIGHT // 5)))
+        screen.blit(restart_buttonSurface, restart_rectangle)
 
     title_rectangle = title_surface.get_rect(center=(WIDTH // 2, HEIGHT // 3))
     screen.blit(title_surface, title_rectangle)
+
+
+    return exit_rectangle, restart_rectangle
 
 def main():
     # setup pygame
@@ -119,7 +138,7 @@ def main():
     while running:
 
         if end:
-            draw_game_end(screen, win)
+            exit_rectangle, restart_rectangle = draw_game_end(screen, win)
         else:
             # poll for events
             # pygame.QUIT event means the user clicked X to close your window
@@ -138,6 +157,8 @@ def main():
                 if reset_rectangle.collidepoint(event.pos):
                     newBoard.reset_to_original()
                 elif restart_rectangle.collidepoint(event.pos):
+                    end = False
+                    win = False
                     difficulty = draw_game_start(screen)
                     newBoard = Board(WIDTH, HEIGHT, screen, difficulty)
                     generatedSudoku, solution = sudoku_generator.generate_sudoku(9, difficulty)
@@ -145,7 +166,9 @@ def main():
                     newBoard.update_board(generatedSudoku)
 
                 elif exit_rectangle.collidepoint(event.pos):
+                    print("a")
                     running = False
+                    end = False
 
                 else:
                     # Selects a square
